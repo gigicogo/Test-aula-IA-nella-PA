@@ -3,7 +3,7 @@
 > **Quiz individuale a risposta multipla** per verificare l'apprendimento in aula (o in autonomia), con stile ispirato a Kahoot: bottoni colorati ▲◆●, spiegazione immediata dopo ogni risposta ed esito finale con progressione per argomento.
 > Un unico file HTML, **zero installazioni, zero account, zero dati inviati in rete**.
 
-🔗 **Demo online:** *(aggiungi qui il link dopo la pubblicazione su GitHub Pages)*
+🔗 **Demo online:** [*(Test d'aula IA generale)*](https://gigicogo.github.io/Test-aula-IA-nella-PA/)
 
 ---
 
