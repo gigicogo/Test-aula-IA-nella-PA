@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Test d'aula · L'IA nella Pubblica Amministrazione — Parte generale sull'IA</title>
+<style>
+  :root{
+    --pur:#46178f; --red:#e21b3c; --blu:#1368ce; --yel:#d89e00; --yelb:#ffa602;
+    --grn:#26890c; --ink:#333; --mut:#6d6d6d; --line:#e4dff2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:600 17px/1.55 "Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;
+    background:linear-gradient(180deg,#5b1fa8 0%,#46178f 45%,#2f1163 100%);background-attachment:fixed;min-height:100vh}
+  .wrap{max-width:820px;margin:0 auto;padding:0 16px 48px}
+  header{margin:28px 0 10px;text-align:center}
+  .chip{display:inline-block;background:var(--yelb);color:#402d00;font-size:12px;font-weight:800;padding:5px 14px;border-radius:999px;letter-spacing:.05em;text-transform:uppercase}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.01em;margin:12px 0 4px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+  .sub{color:rgba(255,255,255,.82);font-size:14px;margin:0}
+  .card{background:#fff;color:var(--ink);border-radius:12px;padding:26px;margin:14px 0;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+  .screen{display:none}
+  .screen.on{display:block;animation:fadein .3s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .warn{background:#fff6da;border-left:6px solid var(--yel);color:#4a3500;padding:12px 16px;border-radius:0 10px 10px 0;font-size:.92rem;margin:14px 0}
+  .qtext{font-size:1.2rem;font-weight:800;line-height:1.4;margin:0 0 20px;color:var(--ink)}
+  .opts{display:grid;gap:12px}
+  .opt{display:flex;gap:14px;align-items:center;border:none;border-radius:8px;padding:16px 18px;color:#fff;font:inherit;font-weight:700;font-size:1.02rem;text-align:left;cursor:pointer;box-shadow:inset 0 -6px 0 rgba(0,0,0,.28);transition:transform .12s,filter .12s;animation:dropin .45s cubic-bezier(.2,.9,.3,1.25) backwards}
+  @keyframes dropin{from{opacity:0;transform:translateY(-26px)}to{opacity:1;transform:none}}
+  .opts .opt:nth-of-type(1){background:var(--red);animation-delay:.02s}
+  .opts .opt:nth-of-type(2){background:var(--blu);animation-delay:.08s}
+  .opts .opt:nth-of-type(3){background:var(--yel);animation-delay:.14s}
+  .opt:hover:not(:disabled){transform:translateY(-3px);filter:brightness(1.08)}
+  .opt:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.28)}
+  .opt:disabled{cursor:default}
+  .opt .let{flex:none;min-width:36px;font-size:25px;line-height:1;text-align:center;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+  .opts .opt.right{background:var(--grn)}
+  .opts .opt.wrong{background:var(--red)}
+  .opts .opt.dim{opacity:.45;filter:saturate(.55)}
+  .fb{border-radius:10px;padding:14px 16px;margin-top:16px;font-size:.95rem;line-height:1.55;font-weight:600}
+  .fb.ok{border-left:8px solid var(--grn);background:#e9f7e2}
+  .fb.ko{border-left:8px solid var(--red);background:#fdecee}
+  .fb b.tag{display:block;margin-bottom:4px;font-weight:800}
+  .fb.ok b.tag{color:var(--grn)}
+  .fb.ko b.tag{color:var(--red)}
+  .big{display:inline-block;background:var(--pur);color:#fff;border:none;border-radius:8px;padding:13px 24px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:inset 0 -5px 0 rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.2);transition:filter .15s,transform .15s}
+  .big:hover{filter:brightness(1.15);transform:translateY(-2px)}
+  .big:active{transform:translateY(1px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.3)}
+  .mini{background:#fff;color:var(--pur);border:3px solid var(--pur);border-radius:8px;padding:10px 18px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .15s,background .15s}
+  .mini:hover{transform:translateY(-2px);background:#f6f2ff}
+  .top{position:sticky;top:0;z-index:5;background:rgba(70,23,143,.93);padding:10px 0 8px;border-bottom:2px solid rgba(255,255,255,.15)}
+  .prow{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:rgba(255,255,255,.9);margin-bottom:6px}
+  .pbar{height:12px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden}
+  .pbar>div{height:100%;width:0;background:linear-gradient(90deg,var(--yelb),#ffbe42);border-radius:999px;transition:width .4s linear}
+  .dots{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .dot{width:16px;height:16px;border-radius:4px;border:2px solid rgba(255,255,255,.45);background:transparent}
+  .dot.ok{background:#66bf39;border-color:#66bf39}
+  .dot.ko{background:#ff3355;border-color:#ff3355}
+  .dot.cur{border-color:var(--yelb)}
+  label.lbl{display:block;font-size:13px;font-weight:700;color:var(--mut);margin:0 0 5px}
+  input[type=text]{width:100%;max-width:420px;font:inherit;font-weight:600;padding:10px 12px;border:3px solid #d9cff2;border-radius:8px;background:#fff;color:var(--ink)}
+  input[type=text]:focus{outline:none;border-color:var(--pur)}
+  .score{font-size:60px;font-weight:800;color:var(--pur);line-height:1;margin:4px 0}
+  .score small{font-size:26px;color:var(--mut);font-weight:800}
+  .verdict{font-size:1.05rem;color:var(--ink);margin:6px 0 0}
+  h3{color:var(--ink);margin:22px 0 8px;font-size:1.05rem}
+  .topic{margin:12px 0}
+  .topic .trow2{display:flex;justify-content:space-between;font-size:.92rem;font-weight:700;margin-bottom:4px}
+  .topic .bar{height:18px;background:#efeaf8;border-radius:999px;overflow:hidden}
+  .topic .bar>div{height:100%;border-radius:999px;transition:width .6s ease}
+  .b-gr{background:linear-gradient(90deg,#26890c,#66bf39)}
+  .b-am{background:linear-gradient(90deg,#d89e00,#ffa602)}
+  .b-rd{background:linear-gradient(90deg,#e21b3c,#ff5c77)}
+  .rev{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0;font-size:.93rem}
+  .rev.ok{border-left:6px solid var(--grn)}
+  .rev.ko{border-left:6px solid var(--red)}
+  .rev .rq{font-weight:800;margin:0 0 6px}
+  .rev .ra{color:var(--mut);margin:0}
+  .rev .rw{margin:8px 0 0;line-height:1.5}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  footer{padding:24px 0;text-align:center;font-size:12px;color:rgba(255,255,255,.7);font-weight:600}
+  .note{color:var(--mut);font-size:.9rem}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media print{.noprint{display:none!important}.card{box-shadow:none;padding:0;margin:8px 0}body{background:#fff;color:#000}h1,h3{color:#000;text-shadow:none}.score,.verdict{color:#000}.chip,.top{display:none}.rev.ok{border-left-color:#26890c}.rev.ko{border-left-color:#e21b3c}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="chip">Parte generale · Test individuale</span>
+  <h1>L'Intelligenza Artificiale — Test di verifica</h1>
+  <p class="sub">12 domande a risposta multipla · ogni risposta è accompagnata dalla spiegazione</p>
+</header>
+
+<section id="start" class="screen on">
+  <div class="card">
+    <h3 style="margin-top:0">Prima di cominciare</h3>
+    <p>Questo test verifica ciò che abbiamo visto nella <strong>parte generale del corso</strong>: che cos'è l'Intelligenza Artificiale, come è organizzata (IA → Machine Learning → Deep Learning), come i sistemi apprendono e che cosa sanno fare gli strumenti generativi. È <strong>individuale</strong>: le risposte restano solo su questo dispositivo.</p>
+    <p class="note">Dopo ogni risposta vedrete una breve spiegazione: anche sbagliare serve a capire. Alla fine avrete l'esito con la progressione per argomento.</p>
+    <div class="warn">⚠️ Nessun dato viene inviato a nessun server. Il nome è facoltativo e resta su questo dispositivo.</div>
+    <div style="margin-top:16px">
+      <label class="lbl" for="nome">Nome e cognome (facoltativo — per la propria traccia)</label>
+      <input type="text" id="nome" placeholder="es. Mario Rossi" autocomplete="off">
+    </div>
+    <div class="actions">
+      <button class="big" id="btnStart">Avvia il test →</button>
+      <button class="mini noprint" id="btnResume" hidden>Riprendi il test lasciato a metà</button>
+    </div>
+  </div>
+</section>
+
+<section id="quiz" class="screen">
+  <div class="top noprint">
+    <div class="prow"><span id="pnum">Domanda 1 di 12</span><span id="pdone">Corrette: 0</span></div>
+    <div class="pbar"><div id="pfill"></div></div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="card" id="qcard"></div>
+</section>
+
+<section id="result" class="screen">
+  <div class="card" id="rcard"></div>
+</section>
+
+<footer>Test d'aula · Percorso «L'IA nella Pubblica Amministrazione» · Nessun dato lascia questo dispositivo</footer>
+</div>
+
+<script>
+"use strict";
+
+// ─────────── DOMANDE (tratte dalle slide della parte generale sull'IA) ───────────
+var QS = [
+  // Concetti di base
+  { t:"base", q:"Che cos'è l'Intelligenza Artificiale?",
+    o:["La capacità di un sistema informatico di archiviare grandi quantità di dati e recuperarli più in fretta di una persona",
+       "La capacità di un sistema informatico di simulare capacità cognitive umane come apprendimento, ragionamento e risoluzione di problemi",
+       "Una disciplina informatica che punta a sostituire il giudizio umano in ogni processo decisionale"],
+    c:1,
+    w:"L'IA è la capacità di un sistema informatico di simulare capacità cognitive umane: apprendimento, ragionamento, risoluzione di problemi e percezione. È una disciplina che studia i processi cognitivi umani per sviluppare sistemi capaci di operare in modo «intelligente»." },
+  { t:"base", q:"Che cosa distingue l'IA debole (o stretta) dall'IA forte (AGI)?",
+    o:["L'IA debole usa esclusivamente dati pubblici, mentre l'AGI elabora solo dati interni e riservati",
+       "L'IA debole è quella disponibile gratuitamente, mentre l'AGI è riservata ai grandi produttori a pagamento",
+       "L'IA debole è focalizzata su compiti specifici e non trasferisce la conoscenza tra domini; l'AGI, ancora non realizzata, saprebbe svolgere qualsiasi compito intellettuale"],
+    c:2,
+    w:"L'IA debole (Narrow AI) opera in ambiti predefiniti: riconoscimento facciale, filtri anti-spam, assistenza vocale, diagnostica medica. L'AGI sarebbe un'intelligenza simile a quella umana, con apprendimento trasversale e comprensione contestuale profonda: resta un obiettivo di ricerca, NON una realtà attuale." },
+  { t:"base", q:"Modelli come GPT-4, Claude e Gemini sono…",
+    o:["IA debole molto avanzata, specializzata nel linguaggio: non possiedono intelligenza generale",
+       "IA forte, perché superano le capacità cognitive umane nella maggior parte dei compiti intellettuali",
+       "Reti neurali non addestrate, che imparano esclusivamente durante la conversazione con l'utente"],
+    c:0,
+    w:"Le capacità impressionanti dei modelli attuali non vanno confuse con l'AGI: restano IA debole molto avanzata, specializzata nel linguaggio. Il corso si focalizza proprio sugli strumenti di IA debole, in particolare su quelli generativi." },
+  { t:"base", q:"Nella gerarchia IA → Machine Learning → Deep Learning, quale affermazione è corretta?",
+    o:["Ogni sistema di Deep Learning è anche un sistema di Machine Learning, ma non viceversa; l'IA Generativa è una potente applicazione del Deep Learning",
+       "Machine Learning e Deep Learning sono campi indipendenti: entrambi derivano dall'IA ma nessuno contiene l'altro",
+       "Ogni sistema di Machine Learning è anche un sistema di Deep Learning, perché il ML richiede sempre reti neurali profonde"],
+    c:0,
+    w:"Ogni livello si basa sul precedente: il Deep Learning è una forma avanzata di Machine Learning, che a sua volta è un campo dell'IA. L'IA Generativa è una potente applicazione del DL, il suo fondamento tecnologico essenziale." },
+  // Machine Learning e apprendimento
+  { t:"ml", q:"Che cosa caratterizza il Machine Learning?",
+    o:["Sistemi che eseguono istruzioni scritte dai programmatori per ogni caso possibile, come un software tradizionale",
+       "Sistemi che copiano letteralmente gli esempi visti, senza capacità di generalizzare a input nuovi",
+       "Sistemi che migliorano automaticamente apprendendo dai dati, senza essere programmati esplicitamente per ogni compito"],
+    c:2,
+    w:"Il ML addestra i computer a imparare dai dati e a migliorare con l'esperienza: identifica schemi e correlazioni tra input noti e output noti, e li usa per formulare previsioni anche su input mai visti prima." },
+  { t:"ml", q:"In che cosa consiste l'apprendimento supervisionato?",
+    o:["Il computer esplora da solo dati non etichettati e vi trova raggruppamenti e relazioni nascoste",
+       "Il computer impara da dati già etichettati, come uno studente con un maestro che mostra esempi con la risposta corretta",
+       "Il computer riceve premi o penalità in base alle conseguenze delle proprie azioni, e ripete i comportamenti migliori"],
+    c:1,
+    w:"«Imparare con un maestro»: l'algoritmo è addestrato su dati in cui la risposta corretta è già nota (email classificate spam/non spam, segnalazioni categorizzate). Esempio PA: classificare automaticamente le email dei cittadini in richieste, reclami, segnalazioni o appuntamenti." },
+  { t:"ml", q:"Un sistema che raggruppa i visitatori del portale comunale per interessi, senza categorie predefinite, usa…",
+    o:["Apprendimento non supervisionato: trova schemi e raggruppamenti nascosti in dati non etichettati",
+       "Apprendimento supervisionato: impara da esempi già categorizzati dai responsabili del servizio",
+       "Apprendimento per rinforzo: migliora grazie ai feedback positivi di chi risolve le proprie pratiche online"],
+    c:0,
+    w:"«Imparare da soli»: senza un maestro che dice cosa cercare, l'algoritmo trova strutture nascoste nei dati (segmentazione, anomalie, topic). Esempio PA: raggruppare le abitudini di navigazione dei cittadini per personalizzare il portale — verificando base giuridica e DPIA con il DPO se ci sono dati personali." },
+  { t:"ml", q:"Come impara un sistema basato su apprendimento per rinforzo?",
+    o:["Analizzando migliaia di esempi già classificati correttamente da esperti, come le radiografie diagnosticate",
+       "Memorizzando tutte le risposte corrette contenute nel manuale operativo del sistema",
+       "Per tentativi ed errori: prova azioni, riceve premi o penalità in base ai risultati e tende a ripetere i comportamenti migliori"],
+    c:2,
+    w:"«Imparare per tentativi ed errori, ricevendo un premio»: come addestrare un animale o imparare ad andare in bicicletta. Esempio PA: un chatbot che impara a dare risposte risolutive ricevendo feedback positivi dai cittadini." },
+  // Deep Learning
+  { t:"dl", q:"Che cos'è il Deep Learning?",
+    o:["Un sottoinsieme avanzato del Machine Learning che usa reti neurali multistrato, efficace su dati complessi e non strutturati",
+       "Una tecnica di archiviazione che organizza i dati su più livelli gerarchici di database distribuiti",
+       "Un metodo di programmazione esplicita in cui ogni regola viene scritta a mano dal programmatore"],
+    c:0,
+    w:"Il DL è un ramo dell'IA (sottoinsieme del ML) basato su reti neurali profonde: strati di neuroni artificiali ispirati al cervello umano. La «profondità» è il numero di strati nascosti: più strati permettono di modellare relazioni più complesse. Eccelle con dati non strutturati come testi, immagini, audio e video." },
+  { t:"dl", q:"Nel confronto tra Machine Learning e Deep Learning, quale affermazione è corretta?",
+    o:["Il ML tradizionale è tipicamente «black box», mentre il Deep Learning è pienamente interpretabile grazie ai suoi livelli di astrazione",
+       "Il Deep Learning offre capacità superiori sui dati complessi, ma è tipicamente «black box» e richiede più dati e potenza di calcolo del ML tradizionale",
+       "Il Deep Learning richiede meno dati e meno potenza di calcolo del ML, per questo è sempre preferibile nella PA"],
+    c:1,
+    w:"Il DL ha complessità algoritmica più alta, richiede volumi di dati e potenza computazionali maggiori ed è tipicamente «black box»; il ML è spesso più trasparente e interpretabile. Entrambi hanno vantaggi e svantaggi che ne determinano l'idoneità per le diverse applicazioni nella PA." },
+  // IA Generativa
+  { t:"gen", q:"Che cosa distingue l'IA generativa dall'IA tradizionale?",
+    o:["Analizza i dati esistenti con maggiore precisione, ma produce esclusivamente classificazioni e report",
+       "Elimina la necessità dei dati, perché crea i contenuti partendo solo dalle istruzioni dell'utente",
+       "Non si limita ad analizzare o classificare dati esistenti: genera contenuti nuovi (testo, immagini, audio, video, codice)"],
+    c:2,
+    w:"L'IA tradizionale analizza o classifica dati esistenti; la GenAI produce qualcosa di nuovo. È un termine ombrello: LLM per il testo (ChatGPT, Claude, Gemini), text-to-image (DALL-E, Midjourney), audio (ElevenLabs), video (Runway, Pika)." },
+  { t:"gen", q:"Su che cosa si basa principalmente l'IA generativa testuale?",
+    o:["Sui LLM, modelli linguistici addestrati su quantità immense di testo, capaci di comprendere e generare linguaggio nuovo e coerente",
+       "Su banche dati relazionali interrogate con linguaggio SQL da motori di ricerca interni all'ente",
+       "Su registrazioni vocali trascritte automaticamente da assistenti virtuali come Siri e Alexa"],
+    c:0,
+    w:"La GenAI si basa sui LLM, i «cervelli digitali» allenati su quantità immense di testo (libri, articoli, pagine web), basati sull'architettura Transformers con meccanismo di «attenzione». Per questo sanno generare testi, riassumere, tradurre e scrivere codice." }
+];
+
+var TOPICS = [
+  { k:"base", l:"Concetti di base (IA, debole/forte, gerarchia)" },
+  { k:"ml",   l:"Machine Learning e tipi di apprendimento" },
+  { k:"dl",   l:"Deep Learning e reti neurali" },
+  { k:"gen",  l:"IA Generativa e LLM" }
+];
+
+// ─────────── STATO ───────────
+var LS = "test_parte_generale_ia_v1";
+var S = { nome:"", ans: QS.map(function(){ return -1; }), finito:false };
+var idx = 0;
+
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ var r = localStorage.getItem(LS); if(r){ S = JSON.parse(r); } }catch(e){} }
+
+// ─────────── RENDER ───────────
+function show(id){
+  ["start","quiz","result"].forEach(function(s){ document.getElementById(s).classList.toggle("on", s===id); });
+  window.scrollTo(0,0);
+}
+
+function dots(){
+  var h = QS.map(function(q,i){
+    var cls = "dot";
+    if(S.ans[i] === QS[i].c) cls += " ok";
+    else if(S.ans[i] > -1) cls += " ko";
+    if(i === idx && !S.finito) cls += " cur";
+    return '<span class="' + cls + '" title="Domanda ' + (i+1) + '"></span>';
+  }).join("");
+  document.getElementById("dots").innerHTML = h;
+}
+
+function prog(){
+  var risp = S.ans.filter(function(a){ return a > -1; }).length;
+  var ok = S.ans.filter(function(a,i){ return a === QS[i].c; }).length;
+  document.getElementById("pnum").textContent = "Domanda " + Math.min(idx+1, QS.length) + " di " + QS.length;
+  document.getElementById("pdone").textContent = "Corrette: " + ok;
+  document.getElementById("pfill").style.width = (risp / QS.length * 100) + "%";
+  dots();
+}
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function renderQ(){
+  var q = QS[idx];
+  var risposto = S.ans[idx] > -1;
+  var LET = ["▲","◆","●"];
+  var h = '<p class="qtext">' + (idx+1) + '. ' + esc(q.q) + '</p><div class="opts">';
+  q.o.forEach(function(o,i){
+    var cls = "opt";
+    if(risposto){
+      if(i === q.c) cls += " right";
+      else if(i === S.ans[idx]) cls += " wrong";
+      else cls += " dim";
+    }
+    var ic = LET[i] + (risposto ? (i === q.c ? " ✓" : (i === S.ans[idx] ? " ✕" : "")) : "");
+    h += '<button class="' + cls + '" ' + (risposto ? "disabled" : 'data-i="' + i + '"') + '><span class="let">' + ic + '</span><span>' + esc(o) + '</span></button>';
+  });
+  h += '</div>';
+  if(risposto){
+    var giusto = S.ans[idx] === q.c;
+    h += '<div class="fb ' + (giusto ? "ok" : "ko") + '"><b class="tag">' + (giusto ? "✅ Risposta corretta" : "❌ Risposta non corretta — quella giusta è evidenziata") + '</b>' + esc(q.w) + '</div>';
+    h += '<div class="actions"><button class="big" id="btnNext">' + (idx+1 >= QS.length ? "Vedi l'esito →" : "Domanda successiva →") + '</button></div>';
+  }
+  document.getElementById("qcard").innerHTML = h;
+  prog();
+}
+
+function renderR(){
+  var tot = QS.length;
+  var ok = S.ans.filter(function(a,i){ return a === QS[i].c; }).length;
+  var perc = Math.round(ok / tot * 100);
+  var msg = perc >= 90 ? "Ottimo: lo scenario è chiaro. Siete pronti per le regole del gioco."
+        : perc >= 70 ? "Buon risultato: qualche passaggio da ripassare, ma la base c'è."
+        : perc >= 50 ? "Base acquisita a metà: rileggete le spiegazioni qui sotto, sono il ripasso più veloce."
+        : "Nessun dramma: ogni spiegazione qui sotto è un mini-ripasso. E i dubbi sono l'elemento più utile da portare in aula.";
+
+  var h = '<h3 style="margin-top:0">Esito del test</h3>';
+  h += '<p class="score">' + ok + '<small> / ' + tot + '</small></p>';
+  h += '<p class="verdict">' + esc(msg) + '</p>';
+  if(S.nome) h += '<p class="note">' + esc(S.nome) + ' · ' + new Date().toLocaleString("it-IT") + '</p>';
+
+  h += '<h3>Progressione per argomento</h3>';
+  TOPICS.forEach(function(t){
+    var okT = 0, nT = 0;
+    QS.forEach(function(q,i){ if(q.t === t.k){ nT++; if(S.ans[i] === q.c) okT++; } });
+    var pT = Math.round(okT / nT * 100);
+    var col = pT >= 70 ? "b-gr" : (pT >= 40 ? "b-am" : "b-rd");
+    h += '<div class="topic"><div class="trow2"><span>' + esc(t.l) + '</span><span>' + okT + '/' + nT + ' · ' + pT + '%</span></div>' +
+         '<div class="bar"><div class="' + col + '" style="width:' + pT + '%"></div></div></div>';
+  });
+
+  h += '<h3>Riepilogo domanda per domanda</h3>';
+  QS.forEach(function(q,i){
+    var giusto = S.ans[i] === q.c;
+    h += '<div class="rev ' + (giusto ? "ok" : "ko") + '"><p class="rq">' + (giusto ? "✅" : "❌") + ' ' + (i+1) + '. ' + esc(q.q) + '</p>';
+    if(!giusto) h += '<p class="ra">La vostra risposta: ' + esc(q.o[S.ans[i] > -1 ? S.ans[i] : 0]) + '</p>';
+    h += '<p class="rw"><em>' + esc(q.w) + '</em></p></div>';
+  });
+
+  h += '<div class="actions noprint"><button class="big" id="btnRestart">↻ Ricomincia</button>' +
+       '<button class="mini" id="btnPrint">Stampa / salva l\'esito</button></div>';
+  document.getElementById("rcard").innerHTML = h;
+}
+
+// ─────────── EVENTI ───────────
+document.getElementById("btnStart").addEventListener("click", function(){
+  S.nome = document.getElementById("nome").value.trim().slice(0,80);
+  S.ans = QS.map(function(){ return -1; });
+  S.finito = false;
+  idx = 0;
+  save();
+  document.getElementById("btnResume").hidden = true;
+  show("quiz");
+  renderQ();
+});
+
+document.getElementById("btnResume").addEventListener("click", function(){
+  if(S.finito){ show("result"); renderR(); return; }
+  var primaLibera = S.ans.findIndex(function(a){ return a === -1; });
+  idx = primaLibera === -1 ? QS.length - 1 : Math.max(0, primaLibera);
+  show("quiz");
+  renderQ();
+});
+
+document.addEventListener("click", function(e){
+  var t = e.target.closest("button");
+  if(!t) return;
+
+  if(t.classList.contains("opt") && t.dataset.i !== undefined){
+    S.ans[idx] = +t.dataset.i;
+    save();
+    renderQ();
+    return;
+  }
+  if(t.id === "btnNext"){
+    if(idx + 1 >= QS.length){ S.finito = true; save(); renderR(); show("result"); }
+    else { idx++; renderQ(); }
+    return;
+  }
+  if(t.id === "btnRestart"){
+    S = { nome:S.nome, ans: QS.map(function(){ return -1; }), finito:false };
+    idx = 0;
+    save();
+    document.getElementById("btnResume").hidden = true;
+    show("start");
+  }
+  if(t.id === "btnPrint"){
+    window.print();
+  }
+});
+
+// ─────────── AVVIO ───────────
+load();
+if(S.ans.some(function(a){ return a > -1; })){
+  document.getElementById("btnResume").hidden = false;
+  document.getElementById("btnResume").textContent = S.finito ? "Rivedi l'esito del test" : "Riprendi il test lasciato a metà";
+  if(S.nome) document.getElementById("nome").value = S.nome;
+}
+</script>
+</body>
+</html>
